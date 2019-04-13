@@ -1,0 +1,287 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace 柱狀加密_T
+{
+    public partial class Form1 : Form
+    {
+        int KeyLength , TxtLength , times , rem;
+        bool KeyBool,KeyLock;
+        string Key, Secret,TextALL;
+        string[] KeyCode , TextCode;
+        public string[] TextCodeFunction(int type)
+        {
+            TextALL = textBox3.Text.Replace(" ", "※").Replace("\r", "∮").Replace("\n", "∞"); //內容
+            TxtLength = TextALL.Length; //內容長度
+            TextCode = new string[KeyLength]; //個別內容字元
+            times = TxtLength / KeyLength;
+            rem = TxtLength % KeyLength;
+            if (type == 0)
+            {
+                progressBar2.Maximum = (KeyLength * times) + rem + KeyLength;
+            }
+            else
+            {
+                progressBar2.Maximum = (KeyLength * times)*2 + rem*2 + (KeyLength*2);
+            }
+            progressBar2.Value = 0;
+            //Start
+            for (int TC = 0; TC < KeyLength; TC++)
+            {
+                TextCode[TC] = "";
+                if (times != 0)
+                {
+                    for (int T = 0; T < times; T++)
+                    {
+                        TextCode[TC] += TextALL.Substring(TC + (KeyLength * T), 1);
+                        progressBar2.Value++;
+                    }
+                }
+            }
+            if (rem != 0)
+            {
+                for (int TC = 0; TC < rem; TC++)
+                {
+                    TextCode[TC] += TextALL.Substring((times * KeyLength) + TC, 1);
+                    progressBar2.Value++;
+                }
+            }
+            return TextCode;
+        }
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            KeyBool = false;
+            progressBar1.Value = 0;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                KeyLock = true;
+            }
+            else {
+                KeyLock = false;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (KeyBool == true)
+            {
+                //Define
+                string[] UnlockTxtStr = new string[KeyLength];
+                string UnlockTxt = "";
+                if (!KeyLock)
+                {
+                    KeyBool = false;
+                }
+                TextCodeFunction(1);
+                TextALL = textBox3.Text.Replace(" ", "※").Replace("\r", "∮").Replace("\n", "∞");
+                int[] CodeStrL = new int[KeyLength];
+                for (int K = 0; K < KeyLength; K++)
+                {
+                    progressBar2.Value++;
+                    CodeStrL[K] = TextCode[K].Length;
+                }
+                for (int Ord = 0; Ord < KeyLength; Ord++)
+                {
+                    switch (KeyCode[Ord])
+                    {
+                        case "1":
+                            UnlockTxtStr[0] = TextALL.Substring(0, CodeStrL[0]);
+                            TextALL = TextALL.Remove(0, CodeStrL[0]);
+                            TextALL += UnlockTxtStr[0];
+                            break;
+                        case "2":
+                            UnlockTxtStr[1] = TextALL.Substring(0, CodeStrL[1]);
+                            TextALL = TextALL.Remove(0, CodeStrL[1]);
+                            break;
+                        case "3":
+                            UnlockTxtStr[2] = TextALL.Substring(0, CodeStrL[2]);
+                            TextALL = TextALL.Remove(0, CodeStrL[2]);
+                            break;
+                        case "4":
+                            UnlockTxtStr[3] = TextALL.Substring(0, CodeStrL[3]);
+                            TextALL = TextALL.Remove(0, CodeStrL[3]);
+                            break;
+                        case "5":
+                            UnlockTxtStr[4] = TextALL.Substring(0, CodeStrL[4]);
+                            TextALL = TextALL.Remove(0, CodeStrL[4]);
+                            break;
+                        case "6":
+                            UnlockTxtStr[5] = TextALL.Substring(0, CodeStrL[5]);
+                            TextALL = TextALL.Remove(0, CodeStrL[5]);
+                            break;
+                        case "7":
+                            UnlockTxtStr[6] = TextALL.Substring(0, CodeStrL[6]);
+                            TextALL = TextALL.Remove(0, CodeStrL[6]);
+                            break;
+                        case "8":
+                            UnlockTxtStr[7] = TextALL.Substring(0, CodeStrL[7]);
+                            TextALL = TextALL.Remove(0, CodeStrL[7]);
+                            break;
+                    }
+                    progressBar2.Value++;
+                }
+                for (int Ord = 0; Ord < times; Ord++)
+                {
+                    for (int Ord2 = 0; Ord2 < KeyLength; Ord2++)
+                    {
+                        UnlockTxt += UnlockTxtStr[Ord2].Substring(Ord, 1);
+                        progressBar2.Value++;
+                    }
+                }
+                for (int Ord = 0; Ord < rem; Ord++)
+                {
+                    UnlockTxt += UnlockTxtStr[Ord].Substring(times, 1);
+                    progressBar2.Value++;
+                }
+                UnlockTxt = UnlockTxt.Replace("※", " ").Replace("∮", "\r").Replace("∞", "\n");
+                textBox1.Text = UnlockTxt;
+            }
+            else
+            {
+                MessageBox.Show("密碼未設定或設定錯誤!");
+            }
+        }
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void button1_Click(object sender, EventArgs e) //Lock Start -----------------------------┐
+        {
+            if (KeyBool == true)
+            {
+                //Define
+                if (!KeyLock)
+                {
+                    KeyBool = false;
+                }
+                Secret = "";
+                TextCodeFunction(0);
+                for (int Ord = 0; Ord < KeyLength; Ord++)
+                {
+                    switch (KeyCode[Ord])
+                    {
+                        case "1":
+                            Secret += TextCode[0];
+                            break;
+                        case "2":
+                            Secret += TextCode[1];
+                            break;
+                        case "3":
+                            Secret += TextCode[2];
+                            break;
+                        case "4":
+                            Secret += TextCode[3];
+                            break;
+                        case "5":
+                            Secret += TextCode[4];
+                            break;
+                        case "6":
+                            Secret += TextCode[5];
+                            break;
+                        case "7":
+                            Secret += TextCode[6];
+                            break;
+                        case "8":
+                            Secret += TextCode[7];
+                            break;
+                    }
+                    progressBar2.Value++;
+                }
+                textBox1.Text = Secret;
+            }
+            else { MessageBox.Show("密碼未設定或設定錯誤!"); }
+        }                                                      //Lock End -------------------------------┘
+
+        private void button3_Click(object sender, EventArgs e)
+        {   
+            //Define
+            KeyBool = true;  //格式正確 
+            bool NotFind = true; //重複字元
+            KeyLength = (int)numericUpDown1.Value; //密碼長度
+            Key = textBox2.Text; //密碼
+            KeyCode = new string[KeyLength]; //個別密碼字元
+            progressBar1.Value = 0; //進度條Val
+            progressBar1.Maximum = (KeyLength * (1 + KeyLength)); //進度條Max
+            //Start
+            if (textBox2.TextLength == KeyLength)   //KeyCode Start -----------------------------------┐
+            {
+                for (int KC = 0; KC < KeyLength; KC++) //CharEnter Start
+                {
+                    string KeyS = Key.Substring(KC, 1);
+                    KeyCode[KC] = KeyS;
+                    progressBar1.Value += 1;
+                }                                      //CharEnter End
+                for (int KC = 0; KC < KeyLength; KC++) //CharTheSame Start
+                {
+                    for (int KC2 = 0; KC2 < KeyLength; KC2++)
+                    {
+                        if (KC == KC2)
+                        {
+                            continue;
+                        }
+                        else if (KeyCode[KC] != KeyCode[KC2])
+                        {
+                            KeyBool = true;
+                        }
+                        else if (KeyCode[KC] == KeyCode[KC2])
+                        {
+                            KeyBool = false;
+                            KC = KeyLength;
+                            break;
+                        }
+                        progressBar1.Value += 1;
+                    }
+                }                                      //CharTheSame End
+                for (int KC = 1; KC <= KeyLength; KC++) //KeyOrder Start
+                {
+                    NotFind = Key.Contains("" + KC);
+                    if (NotFind == false)
+                    {
+                        KeyBool = false;
+                        break;
+                    }
+                    progressBar1.Value += 1;
+                }                                       //KeyOrder End
+            }
+            if (textBox2.TextLength == KeyLength && KeyBool == true)
+            {
+                MessageBox.Show(KeyLength + "位密碼設定完成!");
+            }
+            else if (textBox2.Text == "")
+            {
+                MessageBox.Show("密碼不能為空白");
+                KeyBool = false;
+            }
+            else if (textBox2.TextLength != KeyLength)
+            {
+                MessageBox.Show("密碼長度不符");
+                KeyBool = false;
+            }
+            else if (KeyBool == false)
+            {
+                MessageBox.Show("密碼格式不符\a");
+                KeyBool = false;
+            }//KeyCode End ----------------------------------------------------------------------------┘
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("1. 加密、解密內容不能超過 \"32767\" 個字元。\n2. 上面是未加密內容，按下\"鎖\"加密;下面是加密內容，按下\"鑰匙\"解密。\n3. 密碼請照順序且請勿重複，ex:(4位)2413 or 3412...(5位)31425 or 42153...。\n4. 請勿使用\"※\" \"∮\" \"∞\"字元。\n5. 加解密後請在確認一次密碼。\n6. 練習陣列用。\n7.林昱呈開發練習");
+        }
+    }
+}
